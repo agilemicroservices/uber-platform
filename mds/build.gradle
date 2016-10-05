@@ -1,0 +1,11 @@
+
+dependencies {
+    compile project(':mds-client')
+    compile configurations.jmsapi
+    compile configurations.jackson
+
+    compile group: 'org.agrona', name: 'Agrona', version: '0.5.1'
+
+    testCompile group: 'org.mockito', name: 'mockito-core', version: '1.10.19'
+    testCompile configurations.junit
+}

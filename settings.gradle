@@ -1,0 +1,8 @@
+rootProject.name = 'uber-platform'
+include 'mds'
+include 'uber'
+include 'uber-util'
+include 'integration-spring'
+include 'mds-client'
+include 'integration-quickfixj'
+

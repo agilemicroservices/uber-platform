@@ -1,0 +1,91 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath group: 'com.layer', name: 'gradle-git-repo-plugin', version: '2.0.2'
+    }
+}
+
+
+group 'org.agilemicroservices'
+version '1.0-SNAPSHOT'
+
+apply plugin: 'java'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+
+ext {
+    jmsApiVersion = '1.1-rev-1'
+    jacksonVersion = '2.7.4'
+    junitVersion = '4.11'
+    logbackVersion = '1.0.1'
+}
+
+subprojects {
+    group 'org.agilemicroservices'
+    version '1.0-SNAPSHOT'
+
+    apply plugin: 'java'
+    apply plugin: 'maven-publish'
+    apply plugin: 'git-repo'
+
+    sourceCompatibility = 1.8
+
+    repositories {
+        mavenLocal()
+        mavenCentral()
+    }
+
+
+    ext {
+        gitPublishConfig {
+            org = "agilemicroservices"
+            repo = "maven-repo"
+            gitUrl = 'https://agilemicroservices@github.com/agilemicroservices/maven-repo.git'
+        }
+    }
+
+
+    configurations {
+        slf4j
+        logback
+        jmsapi
+        jackson
+        junit
+    }
+
+    dependencies {
+        slf4j group: 'org.slf4j', name: 'slf4j-api', version: '1.7.21'
+
+        logback group: 'ch.qos.logback', name: 'logback-core', version: logbackVersion
+        logback group: 'ch.qos.logback', name: 'logback-classic', version: logbackVersion
+
+        jmsapi group: 'javax.jms', name: 'jms-api', version: jmsApiVersion
+
+        jackson group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: jacksonVersion
+        jackson group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: jacksonVersion
+        jackson group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: jacksonVersion
+
+        junit group: 'junit', name: 'junit', version: junitVersion
+    }
+
+
+    publishing {
+        repositories {
+            maven {
+                url "file://${gitPublishConfig.home}/${gitPublishConfig.org}/${gitPublishConfig.repo}/releases"
+            }
+        }
+        publications {
+            maven(MavenPublication) {
+                from components.java
+            }
+        }
+    }
+}

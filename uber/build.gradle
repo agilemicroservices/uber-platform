@@ -1,0 +1,25 @@
+plugins {
+    id 'java'
+    id 'com.github.johnrengelman.shadow' version '1.2.3'
+}
+
+
+configurations {
+    compileUber
+    compile.extendsFrom compileUber
+}
+
+shadowJar {
+    configurations = [ project.configurations.compileUber ]
+}
+
+dependencies {
+    compile group: 'org.wildfly.core', name: 'wildfly-server', version: '2.1.0.Final'
+
+    compileUber project(':uber-util')
+    compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.21'
+    //compileUber group: 'ch.qos.logback', name: 'logback-core', version: '1.0.1'
+    //compileUber group: 'ch.qos.logback', name: 'logback-classic', version: '1.0.1'
+
+    testCompile configurations.junit
+}
