@@ -6,8 +6,6 @@ import org.agilemicroservices.mds.integration.TransactionStrategy;
 import org.agilemicroservices.mds.util.DestinationUri;
 import org.agilemicroservices.mds.util.ServiceMethod;
 import org.agrona.concurrent.Agent;
-import org.apache.activemq.artemis.api.core.management.ObjectNameBuilder;
-import org.apache.activemq.artemis.api.jms.ActiveMQJMSClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,12 +47,16 @@ class DispatchAgent implements Agent {
 
     private Destination createDestination(DestinationUri uri) {
         Destination destination;
-        if (uri.isQueue()) {
-            destination = ActiveMQJMSClient.createQueue(uri.getName());
-        } else if (uri.isTopic()) {
-            destination = ActiveMQJMSClient.createTopic(uri.getName());
-        } else {
-            throw new IllegalArgumentException("Invalid scheme " + uri.getScheme());
+        try {
+            if (uri.isQueue()) {
+                destination = session.createQueue(uri.getName());
+            } else if (uri.isTopic()) {
+                destination = session.createTopic(uri.getName());
+            } else {
+                throw new IllegalArgumentException("Invalid scheme " + uri.getScheme());
+            }
+        } catch (JMSException e) {
+            throw new IllegalStateException("Unable to create JMS destination '" + uri.getName() + "'.");
         }
 
         return destination;
