@@ -1,6 +1,8 @@
 package org.agilemicroservices.uber;
 
+import org.agilemicroservices.uber.util.UberProperties;
 import org.jboss.as.controller.*;
+import org.jboss.as.controller.descriptions.ModelDescriptionConstants;
 import org.jboss.as.controller.descriptions.StandardResourceDescriptionResolver;
 import org.jboss.as.controller.operations.common.GenericSubsystemDescribeHandler;
 import org.jboss.as.controller.parsing.ExtensionParsingContext;
@@ -15,6 +17,7 @@ import org.jboss.staxmapper.XMLExtendedStreamWriter;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
+import java.util.Collections;
 import java.util.List;
 
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.*;
@@ -68,9 +71,48 @@ public class UberExtension implements Extension {
 
         @Override
         public void readElement(XMLExtendedStreamReader reader, List<ModelNode> list) throws XMLStreamException {
-            // Require no content
-            ParseUtils.requireNoContent(reader);
+            ParseUtils.requireNoAttributes(reader);
             list.add(createAddSubsystemOperation());
+
+            while (reader.hasNext() && reader.nextTag() != END_ELEMENT) {
+                if (!reader.getLocalName().equals("properties")) {
+                    throw ParseUtils.unexpectedElement(reader);
+                }
+                while (reader.hasNext() && reader.nextTag() != END_ELEMENT) {
+                    if (reader.isStartElement()) {
+                        readProperty(reader, list);
+                    }
+                }
+            }
+        }
+
+        private void readProperty(XMLExtendedStreamReader reader, List<ModelNode> list) throws XMLStreamException {
+            if (!reader.getLocalName().equals("property")) {
+                throw ParseUtils.unexpectedElement(reader);
+            }
+
+            String propertyName = null;
+            String propertyValue = null;
+            for (int i = 0; i < reader.getAttributeCount(); i++) {
+                String attr = reader.getAttributeLocalName(i);
+                String value = reader.getAttributeValue(i);
+                if (attr.equals("name")) {
+                    propertyName = value;
+                } else if (attr.equals("value")) {
+                    propertyValue = value;
+                } else {
+                    throw ParseUtils.unexpectedAttribute(reader, i);
+                }
+            }
+            ParseUtils.requireNoContent(reader);
+            if (propertyName == null) {
+                throw ParseUtils.missingRequiredElement(reader, Collections.singleton("name"));
+            }
+            if (propertyValue == null) {
+                throw ParseUtils.missingRequiredElement(reader, Collections.singleton("value"));
+            }
+
+            UberProperties.INSTANCE.addProperty(propertyName, propertyValue);
         }
     }
 }

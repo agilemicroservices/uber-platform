@@ -14,7 +14,7 @@ shadowJar {
 }
 
 dependencies {
-    compile group: 'org.wildfly.core', name: 'wildfly-server', version: '2.1.0.Final'
+    compile group: 'org.wildfly.core', name: 'wildfly-server', version: '3.0.8.Final'
 
     compileUber project(':uber-util')
     compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.21'
