@@ -14,12 +14,10 @@ shadowJar {
 }
 
 dependencies {
-    compile group: 'org.wildfly.core', name: 'wildfly-server', version: '3.0.8.Final'
+    compile group: 'org.wildfly.core', name: 'wildfly-server', version: '6.0.2.Final'
 
     compileUber project(':uber-util')
-    compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.21'
-    //compileUber group: 'ch.qos.logback', name: 'logback-core', version: '1.0.1'
-    //compileUber group: 'ch.qos.logback', name: 'logback-classic', version: '1.0.1'
+    compile configurations.slf4j
 
     testCompile configurations.junit
 }

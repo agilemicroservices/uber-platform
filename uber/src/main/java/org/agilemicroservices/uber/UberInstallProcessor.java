@@ -84,7 +84,7 @@ public class UberInstallProcessor implements DeploymentUnitProcessor {
         deploymentUnit.addToAttachmentList(Attachments.DEPLOYMENT_COMPLETE_SERVICES, startServiceName);
 
         startBuilder.addDependency(createServiceName, Component.class, startService.getComponentInjector());
-        Services.addServerExecutorDependency(startBuilder, startService.getExecutorInjector(), false);
+        Services.addServerExecutorDependency(startBuilder, startService.getExecutorInjector()); //, false);
 
         createBuilder.install();
         startBuilder.install();

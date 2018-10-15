@@ -62,6 +62,7 @@ public class UberCreateService implements Service<Component> {
 
     @Override
     public synchronized void stop(StopContext context) {
+        // TODO invoke stop
         component = null;
     }
 

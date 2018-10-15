@@ -17,6 +17,7 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
 
 
+@Ignore
 public class ServiceManagerUnitTest {
     private static final Queue QUEUE = ActiveMQJMSClient.createQueue("test");
     private static final Topic TOPIC = ActiveMQJMSClient.createTopic("test");
