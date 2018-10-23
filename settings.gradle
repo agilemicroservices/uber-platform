@@ -5,4 +5,5 @@ include 'uber-util'
 include 'integration-spring'
 include 'mds-client'
 include 'integration-quickfixj'
+include 'activator-annotation-processor'
 
