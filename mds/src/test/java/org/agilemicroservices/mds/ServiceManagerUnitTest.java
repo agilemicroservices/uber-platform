@@ -105,11 +105,11 @@ public class ServiceManagerUnitTest {
 
     public class TestImpl {
 
-        @JmsInbound("queue:test")
+        @JmsInbound(value = "queue:test")
         public void queue(String message) {
         }
 
-        @JmsInbound("topic:test")
+        @JmsInbound(value = "topic:test")
         public void topic(String message) {
         }
     }
