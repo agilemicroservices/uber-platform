@@ -15,11 +15,10 @@ import java.lang.IllegalStateException;
 
 class DispatchAgent implements Agent {
     private static final Logger LOGGER = LoggerFactory.getLogger(DispatchAgent.class);
-    // TODO tune
-    // private static final int DEFAULT_MAX_MESSAGE_LIMIT = 1;
 
     private SerializationStrategy serializationStrategy;
     private TransactionStrategy transactionStrategy;
+    private AuthHandler authHandler;
     private Object receiver;
     private ServiceMethod serviceMethod;
     private Session session;
@@ -28,12 +27,14 @@ class DispatchAgent implements Agent {
 
 
     DispatchAgent(Object receiver, ServiceMethod serviceMethod, Session session,
-                  SerializationStrategy serializationStrategy, TransactionStrategy transactionStrategy, int batchSize) {
+                  SerializationStrategy serializationStrategy, TransactionStrategy transactionStrategy,
+                  AuthHandler authHandler, int batchSize) {
         this.receiver = receiver;
         this.serviceMethod = serviceMethod;
         this.session = session;
         this.serializationStrategy = serializationStrategy;
         this.transactionStrategy = transactionStrategy;
+        this.authHandler = authHandler;
         this.batchSize = batchSize;
 
         Destination destination = createDestination(serviceMethod.getInboundUri());
@@ -184,6 +185,8 @@ class DispatchAgent implements Agent {
                 if (null == message) {
                     break;
                 }
+
+                authHandler.handleMessage(message);
 
                 if (null == transaction) {
                     LOGGER.debug("Beginning database transaction, service={}.", serviceMethod);

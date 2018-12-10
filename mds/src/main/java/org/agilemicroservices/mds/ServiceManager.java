@@ -3,13 +3,11 @@ package org.agilemicroservices.mds;
 import org.agilemicroservices.mds.integration.SerializationStrategy;
 import org.agilemicroservices.mds.integration.TransactionStrategy;
 import org.agilemicroservices.mds.integration.jackson.JacksonJsonSerializationStrategy;
-import org.agilemicroservices.mds.interceptorchain.ServiceInvocationInterceptor;
 
 import javax.jms.*;
 import java.lang.IllegalStateException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -39,13 +37,14 @@ import java.util.function.Function;
 // TODO improve name
 // TODO register method should accept Object
 public class ServiceManager {
+    private static final AuthHandler DEFAULT_AUTH_HANDLER = message -> {};
     private static final int DEFAULT_BATCH_SIZE = 1;
     private static final Map<String, SerializationStrategy> DEFAULT_SERIALIZER_MAP =
             Collections.singletonMap("json", new JacksonJsonSerializationStrategy());
 
     private ArrayList<Container> containers = new ArrayList<>();
     private Map<String, SerializationStrategy> formatToSerializerMap;
-    private List<ServiceInvocationInterceptor> interceptors;
+    private AuthHandler authHandler;
     private TransactionStrategy transactionManager;
     private ConnectionFactory connectionFactory;
     private Connection connection;
@@ -67,22 +66,22 @@ public class ServiceManager {
 
     public ServiceManager(ConnectionFactory connectionFactory, TransactionStrategy transactionManager,
                           Map<String, SerializationStrategy> formatToSerializerMap, int batchSize) {
-        this(connectionFactory, transactionManager, formatToSerializerMap, new ArrayList<>(), batchSize);
+        this(connectionFactory, transactionManager, formatToSerializerMap, DEFAULT_AUTH_HANDLER, batchSize);
     }
 
     public ServiceManager(ConnectionFactory connectionFactory, TransactionStrategy transactionManager,
                           Map<String, SerializationStrategy> formatToSerializerMap,
-                          List<ServiceInvocationInterceptor> interceptors) {
-        this(connectionFactory, transactionManager, formatToSerializerMap, interceptors, DEFAULT_BATCH_SIZE);
+                          AuthHandler authHandler) {
+        this(connectionFactory, transactionManager, formatToSerializerMap, authHandler, DEFAULT_BATCH_SIZE);
     }
 
     public ServiceManager(ConnectionFactory connectionFactory, TransactionStrategy transactionManager,
                           Map<String, SerializationStrategy> formatToSerializerMap,
-                          List<ServiceInvocationInterceptor> interceptors, int batchSize) {
+                          AuthHandler authHandler, int batchSize) {
         this.connectionFactory = connectionFactory;
         this.transactionManager = transactionManager;
         this.formatToSerializerMap = formatToSerializerMap;
-        this.interceptors = interceptors;
+        this.authHandler = authHandler;
         this.batchSize = batchSize;
 
         try {
@@ -112,7 +111,7 @@ public class ServiceManager {
      */
     public void register(Object obj) {
         ServiceContainer container = new ServiceContainer(obj, connection, formatToSerializerMap, transactionManager,
-                batchSize);
+                authHandler, batchSize);
         containers.add(container);
     }
 

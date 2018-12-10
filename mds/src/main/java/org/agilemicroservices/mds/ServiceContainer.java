@@ -21,7 +21,7 @@ class ServiceContainer implements Container {
 
 
     ServiceContainer(Object service, Connection connection, Map<String, SerializationStrategy> formatToSerializerMap,
-                     TransactionStrategy transactionStrategy, int batchSize) {
+                     TransactionStrategy transactionStrategy, AuthHandler authHandler, int batchSize) {
         Map<String, List<DispatchAgent>> scopeToDispatchersMap = new HashMap<>();
         Map<String, Session> scopeToSessionMap = new HashMap<>();
 
@@ -35,6 +35,7 @@ class ServiceContainer implements Container {
                     session,
                     formatToSerializerMap.get(serviceMethod.getFormat()),
                     transactionStrategy,
+                    authHandler,
                     batchSize);
 
             addDispatcher(dispatcher, scope, scopeToDispatchersMap);
